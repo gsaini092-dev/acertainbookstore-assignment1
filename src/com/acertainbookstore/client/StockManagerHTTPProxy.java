@@ -147,15 +147,14 @@ public class StockManagerHTTPProxy implements StockManager {
 	 * 
 	 * @see com.acertainbookstore.interfaces.StockManager#getBooksInDemand()
 	 */
+	@SuppressWarnings("unchecked")
 	@Override
 	public List<StockBook> getBooksInDemand() throws BookStoreException {
-		HttpExchange ex = new HttpExchange(true);
 		String urlString = serverAddress + "/" + BookStoreMessageTag.GETBOOKSINDEMAND;
-
-		exchange.setURL(urlString);
-
-		return (List<StockBook>) BookStoreUtility.SendAndRecv(this.client,
-				exchange);
+		BookStoreRequest bookStoreRequest = BookStoreRequest.newGetRequest(urlString);
+		BookStoreResponse bookStoreResponse = BookStoreUtility.performHttpExchange(client, bookStoreRequest,
+				serializer.get());
+		return (List<StockBook>) bookStoreResponse.getList();
 	}
 
 	/*

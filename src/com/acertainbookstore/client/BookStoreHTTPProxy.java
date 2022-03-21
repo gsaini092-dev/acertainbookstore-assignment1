@@ -142,6 +142,44 @@ public class BookStoreHTTPProxy implements BookStore {
 		return (List<Book>) bookStoreResponse.getList();
 	}
 
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see com.acertainbookstore.interfaces.BookStore#rateBooks(java.util.Set)
+	 */
+	@Override
+	public void rateBooks(Set<BookRating> bookRating) throws BookStoreException {
+		String urlString = serverAddress + "/" + BookStoreMessageTag.RATEBOOKS;
+		BookStoreRequest bookStoreRequest = BookStoreRequest.newPostRequest(urlString, bookRating);
+		BookStoreUtility.performHttpExchange(client, bookStoreRequest, serializer.get());
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see com.acertainbookstore.interfaces.BookStore#getTopRatedBooks(int)
+	 */
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<Book> getTopRatedBooks(int numBooks) throws BookStoreException {
+		String urlEncodedNumBooks = null;
+
+		try {
+			urlEncodedNumBooks = URLEncoder.encode(Integer.toString(numBooks), "UTF-8");
+		} catch (UnsupportedEncodingException ex) {
+			throw new BookStoreException("unsupported encoding of numbooks", ex);
+		}
+
+		String urlString = serverAddress + "/" + BookStoreMessageTag.GETTOPRATEDBOOKS + "?"
+				+ BookStoreConstants.BOOK_NUM_PARAM + "=" + urlEncodedNumBooks;
+
+		BookStoreRequest bookStoreRequest = BookStoreRequest.newGetRequest(urlString);
+		BookStoreResponse bookStoreResponse = BookStoreUtility.performHttpExchange(client, bookStoreRequest,
+				serializer.get());
+		return (List<Book>) bookStoreResponse.getList();
+	}
+	
 	/**
 	 * Stops the proxy.
 	 */
@@ -153,23 +191,4 @@ public class BookStoreHTTPProxy implements BookStore {
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see com.acertainbookstore.interfaces.BookStore#rateBooks(java.util.Set)
-	 */
-	@Override
-	public void rateBooks(Set<BookRating> bookRating) throws BookStoreException {
-		throw new BookStoreException();
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see com.acertainbookstore.interfaces.BookStore#getTopRatedBooks(int)
-	 */
-	@Override
-	public List<Book> getTopRatedBooks(int numBooks) throws BookStoreException {
-		throw new BookStoreException();
-	}
 }
